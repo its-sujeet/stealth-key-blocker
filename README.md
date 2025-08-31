@@ -1,4 +1,4 @@
-# Disable Windows Keys
+# Stealth Key Blocker
 
 A lightweight, silent background utility that blocks common gaming disruption keys on Windows.
 
