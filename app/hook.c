@@ -7,26 +7,44 @@
 
 LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam) {
   if (nCode == HC_ACTION) {
-    assert(wParam == WM_KEYDOWN || wParam == WM_KEYUP ||
-           wParam == WM_SYSKEYDOWN || wParam == WM_SYSKEYUP);
-
-    DWORD vkCode = ((KBDLLHOOKSTRUCT *)lParam)->vkCode;
-
-    // If it's the Windows key
+    KBDLLHOOKSTRUCT* pKbd = (KBDLLHOOKSTRUCT*)lParam;
+    DWORD vkCode = pKbd->vkCode;
+    
+    // Block Windows keys
     if (vkCode == VK_LWIN || vkCode == VK_RWIN) {
-
-      // Notify app
-      if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
-        HWND hwnd = FindWindow(MAIN_WINDOW_CLASS, 0);
-        if (hwnd)
-          PostMessage(hwnd, WM_KEYPRESS_INTERCEPTED, 0, 0);
-      }
-
-      // Stop propagation
-      return 1;
+      return 1; // Block the key
+    }
+    
+    // Block Ctrl keys
+    if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) {
+      return 1; // Block the key
+    }
+    
+    // Block Alt keys
+    if (vkCode == VK_LMENU || vkCode == VK_RMENU) {
+      return 1; // Block the key
+    }
+    
+    // Block Escape key
+    if (vkCode == VK_ESCAPE) {
+      return 1; // Block the key
+    }
+    
+    // Block Delete key
+    if (vkCode == VK_DELETE) {
+      return 1; // Block the key
+    }
+    
+    // Block Insert key
+    if (vkCode == VK_INSERT) {
+      return 1; // Block the key
+    }
+    
+    // Block Tab when Alt is pressed (Alt+Tab)
+    if (vkCode == VK_TAB && (GetAsyncKeyState(VK_MENU) & 0x8000)) {
+      return 1; // Block the key
     }
   }
-
-  // Propagate the event
+  
   return CallNextHookEx(NULL, nCode, wParam, lParam);
 }

@@ -1,22 +1,40 @@
-setlocal
+@echo off
+echo Building disable-windows-keys...
 
-: remove MinGW from PATH
-@set PATH=%PATH:C:\MinGW\bin;=%
-@set CONFIGURATION=Release
-@set SOURCE_DIR=%~dp0
-@set BUILD_DIR=%~dp0build\vs2019
-@set SETUP_DIR=%BUILD_DIR%\setup\%CONFIGURATION%
+:: Create build directory if it doesn't exist
+if not exist "build" mkdir build
 
-mkdir "%BUILD_DIR%"
-pushd "%BUILD_DIR%"
-  cmake -G "Visual Studio 16 2019" -A Win32 %SOURCE_DIR% -DSIGN=ON || goto :ERROR
-  cmake --build . --config %CONFIGURATION% -t setup || goto :ERROR
-popd
+:: Change to app directory
+cd app
 
-move "%SETUP_DIR%\*.exe" .
+:: Build the hook DLL
+echo Building hook DLL...
+gcc -shared -o ..\build\disable-windows-keys-hook.dll hook.c hook.def -luser32 -lkernel32 -DUNICODE -D_UNICODE -municode
 
-exit /b 0
+if %errorlevel% neq 0 (
+    echo Error: Hook DLL compilation failed!
+    pause
+    exit /b 1
+)
 
-:ERROR
+:: Build the main application
+echo Building main application...
+gcc -o ..\build\disable-windows-keys.exe app.c -luser32 -lkernel32 -DUNICODE -D_UNICODE -municode -mwindows
+
+if %errorlevel% neq 0 (
+    echo Error: Main application compilation failed!
+    pause
+    exit /b 1
+)
+
+:: Return to root directory
+cd ..
+
+echo Build completed successfully!
+echo Files created in 'build' directory:
+echo - disable-windows-keys.exe
+echo - disable-windows-keys-hook.dll
+echo.
+echo To run: build\disable-windows-keys.exe
+echo To stop: Use Task Manager to kill the process
 pause
-exit /b 1
