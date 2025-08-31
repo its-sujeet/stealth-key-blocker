@@ -1,52 +1,129 @@
-Disable Windows Keys
-====================
+# Disable Windows Keys
 
-The simplest way to disable the Windows keys!
+A lightweight, silent background utility that blocks common gaming disruption keys on Windows.
 
-![Screenshot of the application Disable Windows keys](https://i.imgur.com/YG60aro.png)
+## Attribution
 
-You're playing your favorite game, but suddenly you're back in the Windows desktop because you accidentally pressed the Windows keys? 😭
+This is a fork of the original [disable-windows-keys](https://github.com/bblanchon/disable-windows-keys) project by **bblanchon**. The original project has been enhanced to support additional key blocking and silent background operation.
 
-It happened to me all the time when playing Overcooked! 2; that's why I created this app.
-It's very simple and works with any game (Fortnite, Overwatch, WoW, Dota 2, CSGO, etc.).
+## Overview
 
-## How to disable Windows keys?
+Tired of accidentally hitting Windows, Ctrl, Alt, or other disruptive keys while gaming? This utility runs silently in the background and blocks key combinations that commonly interrupt gaming sessions.
 
-There are other ways to disable the Windows keys on your keyboard:
+**Key Features:**
+- **Silent Operation**: Runs in background with no GUI or notifications
+- **Comprehensive Blocking**: Blocks Windows keys, Ctrl, Alt, Esc, Delete, Insert, and Alt+Tab
+- **Gaming Focused**: Designed specifically for uninterrupted gaming sessions
+- **Lightweight**: Minimal system resource usage
+- **No Installation Required**: Portable executable
 
-* Edit the scancode map on the registry
-* Change the Group Policy
-* Remap keys with [SharpKeys](https://github.com/randyrants/sharpkeys)
-* Write a script for [AutoHotKey](https://www.autohotkey.com/)
-* Download a shady utility from an untrusted source
+## Blocked Keys
 
-This app offers a straightforward and reliable alternative to disable Windows keys.
+The application blocks the following keys and combinations:
+- **Windows Key** (Left and Right)
+- **Ctrl** (Left and Right)
+- **Alt** (Left and Right)
+- **Escape**
+- **Delete**
+- **Insert**
+- **Alt+Tab** (prevents window switching)
 
-## How to use this app?
+**Note**: Some system keys like Ctrl+Alt+Delete and Function keys cannot be reliably blocked by user-mode applications and remain functional for system security.
 
-It could not be easier:
+## How It Works
 
-* Open the app to disable the Windows keys.
-* Close the app to re-enable them.
+This utility uses Windows low-level keyboard hooks to intercept and block specified key presses before they reach the system or other applications. It runs as a silent background process with no visible interface.
 
-It's so simple **my mom could use it!**  👵
+## Usage
 
-## Features
+### Starting the Application
+1. Run `disable-windows-keys.exe`
+2. The application starts silently in the background
+3. No window or system tray icon appears
+4. Keys are immediately blocked
 
-* Dead simple
-* Doesn't try to be smart
-* No fancy or useless feature
-* Tiny footprint
-* Works on Windows 7, 8, and 10
-* Self-contained, nothing else to download
-* Perfect for games
-* Translated in several languages
-* Signed binary files for more security
-* Source code available
+### Stopping the Application
+Since the application runs silently, you can stop it using:
+- **Task Manager**: End the `disable-windows-keys.exe` process
+- **Command Line**: `taskkill /f /im disable-windows-keys.exe`
 
-## How to download?
+### Checking if Running
+Check Task Manager for the `disable-windows-keys.exe` process to verify it's running.
 
-You can get this app for free by compiling it from the source code.
+## Building from Source
 
-Alternatively, you can [purchase the binary version for just 1€](https://payhip.com/b/T6si).  
-The executable is signed with my personal certificate, so you know it hasn't been tampered.
+### Prerequisites
+- GCC compiler (MinGW recommended for Windows)
+- Windows SDK headers
+
+### Build Instructions
+1. Clone or download this repository
+2. Run the build script:
+   ```batch
+   build.bat
+   ```
+3. The compiled executable will be in the `build/` directory
+
+### Manual Build
+```batch
+gcc -shared -o build/disable-windows-keys-hook.dll app/hook.c app/hook.def -luser32
+gcc -o build/disable-windows-keys.exe app/app.c -L./build -ldisable-windows-keys-hook -luser32
+```
+
+## Files Structure
+
+```
+├── app/
+│   ├── app.c              # Main application logic
+│   ├── hook.c             # Keyboard hook implementation
+│   ├── hook.def           # DLL export definitions
+│   ├── shared.h           # Shared definitions
+│   ├── stdafx.h           # Standard headers
+│   └── version.h          # Version information
+├── build/                 # Compiled binaries
+├── build.bat             # Build script
+├── clean.bat             # Cleanup script
+└── README.md             # This file
+```
+
+## System Requirements
+
+- **Operating System**: Windows 7, 8, 10, 11
+- **Architecture**: x86/x64
+- **Permissions**: Standard user permissions (no admin required)
+
+## Safety and Security
+
+- **Open Source**: Full source code available for inspection
+- **No Network Activity**: Application operates entirely offline
+- **No Data Collection**: No user data is collected or transmitted
+- **Minimal Permissions**: Runs with standard user privileges
+
+## Troubleshooting
+
+**Application won't start:**
+- Ensure both `disable-windows-keys.exe` and `disable-windows-keys-hook.dll` are in the same directory
+- Check Windows Defender or antivirus hasn't quarantined the files
+
+**Keys still working:**
+- Verify the process is running in Task Manager
+- Some protected key combinations (like Ctrl+Alt+Delete) cannot be blocked for security reasons
+
+**High CPU usage:**
+- This is not expected; if it occurs, terminate the process and rebuild
+
+## Alternative Solutions
+
+If this utility doesn't meet your needs, consider:
+- Registry scancode mapping
+- Group Policy modifications
+- [SharpKeys](https://github.com/randyrants/sharpkeys) for permanent remapping
+- [AutoHotkey](https://www.autohotkey.com/) for custom scripting
+
+## License
+
+This project is open source. See LICENSE.txt for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit issues or pull requests.
